@@ -138,6 +138,6 @@ def pagina_404(error):
     return "<h1>La pagina no existe</h1>", 404
 
 
-if __name__ == '__main__':
-    app.register_error_handler(404, pagina_404)
-    app.run()
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
