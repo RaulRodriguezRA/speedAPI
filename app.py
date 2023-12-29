@@ -134,6 +134,24 @@ def formato_producto(payload):
             "anchura": payload['anchura']}
 
 
+@app.route('/producto/nombre/<producto>', methods=['GET'])
+def consultar_productos(producto):
+    fms = connect()
+    try:
+        find_query = [{'nombre': producto}]
+        foundset = fms.find(find_query)
+        if foundset is not None:
+            valores = foundset[0].values()
+            return jsonify({"mensaje": "Registro encontrado", "productos": datos_producto(valores)})
+        else:
+            return jsonify({"Error": "Hubo un error al realizar la consulta"})
+    except RequestException as _:
+        return jsonify({"Error": "No se pudo establecer conexión con la base de datos"})
+    except fmrest.exceptions.FileMakerError as _:
+        return jsonify({"Error": "Registro no encontrado"})
+    finally:
+        fms.logout()
+
 def pagina_404(error):
     return "<h1>La pagina no existe</h1>", 404
 
