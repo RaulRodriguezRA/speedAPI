@@ -135,7 +135,7 @@ def formato_producto(payload):
 
 
 @app.route('/producto/nombre/<producto>', methods=['GET'])
-def consultar_productos(producto):
+def encontrar_productos(producto):
     fms = connect()
     try:
         find_query = [{'nombre': producto}]
