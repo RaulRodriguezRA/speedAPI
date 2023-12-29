@@ -121,7 +121,7 @@ def eliminar_producto(id_producto):
 
 
 def datos_producto(registro):
-    return {"nombre": registro[0], "precio": registro[1], "material": registro[2],
+    return {"id_registro":registro[7],"nombre": registro[0], "precio": registro[1], "material": registro[2],
             "unidad": registro[3],
             "color": registro[4], "altura": registro[5], "anchura": registro[6]}
 
