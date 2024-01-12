@@ -14,14 +14,14 @@ def connect():
     urllib3.disable_warnings()
     fmrest.utils.TIMEOUT = 30
     try:
-       server = fmrest.Server('https://a0410012.fmphost.com/',
-                                   user='Invitado',
-                                   password='speed',
-                                   database='Productos',
-                                   layout='Lista de precios',
-                                   verify_ssl=True,
-                                   api_version='vLatest'
-                                   )
+        server = fmrest.Server('https://a0410012.fmphost.com/',
+                               user='Invitado',
+                               password='speed',
+                               database='Productos',
+                               layout='Lista de precios',
+                               verify_ssl=True,
+                               api_version='vLatest'
+                               )
         server.login()
         return server
     except ValueError as err:
@@ -31,6 +31,11 @@ def connect():
         return str(err), 500
     except RequestException as err:
         return 'There was an error connecting to the server, the request timed out\\n\\n' + str(err), 500
+
+
+fm = connect()
+records = fm.get_records()
+print(records)
 
 
 @app.route('/producto/<id_producto>', methods=['GET'])
@@ -66,6 +71,25 @@ def consultar_productos():
             return jsonify({"Error": "Hubo un error al realizar la consulta"})
     except RequestException as _:
         return jsonify({"Error": "No se pudo establecer conexión con la base de datos"})
+    finally:
+        fms.logout()
+
+
+@app.route('/producto/nombre/<producto>', methods=['GET'])
+def encontrar_productos(producto):
+    fms = connect()
+    try:
+        find_query = [{'nombre': producto}]
+        foundset = fms.find(find_query)
+        if foundset is not None:
+            valores = foundset[0].values()
+            return jsonify({"mensaje": "Registro encontrado", "productos": datos_producto(valores)})
+        else:
+            return jsonify({"Error": "Hubo un error al realizar la consulta"})
+    except RequestException as _:
+        return jsonify({"Error": "No se pudo establecer conexión con la base de datos"})
+    except fmrest.exceptions.FileMakerError as _:
+        return jsonify({"Errorres": "Registro no encontrado"})
     finally:
         fms.logout()
 
@@ -120,6 +144,14 @@ def eliminar_producto(id_producto):
         fms.logout()
 
 
+'''def datos_producto(registro):
+    return {"nombre": registro[0], "precio": registro[1], "material": registro[2],
+            "unidad": registro[3],
+            "color": registro[4], "altura": registro[5], "anchura": registro[6]}
+
+'''
+
+
 def datos_producto(registro):
     return {"Codigo": registro[0], "Nombre": registro[1], "Descripcion": registro[2],
             "Medida": registro[3], "Precio P": registro[4], "Precio M": registro[5]}
@@ -133,28 +165,10 @@ def formato_producto(payload):
             "anchura": payload['anchura']}
 
 
-@app.route('/producto/nombre/<producto>', methods=['GET'])
-def encontrar_productos(producto):
-    fms = connect()
-    try:
-        find_query = [{'nombre': producto}]
-        foundset = fms.find(find_query)
-        if foundset is not None:
-            valores = foundset[0].values()
-            return jsonify({"mensaje": "Registro encontrado", "productos": datos_producto(valores)})
-        else:
-            return jsonify({"Error": "Hubo un error al realizar la consulta"})
-    except RequestException as _:
-        return jsonify({"Error": "No se pudo establecer conexión con la base de datos"})
-    except fmrest.exceptions.FileMakerError as _:
-        return jsonify({"Error": "Registro no encontrado"})
-    finally:
-        fms.logout()
-
 def pagina_404(error):
     return "<h1>La pagina no existe</h1>", 404
 
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
+if __name__ == '__main__':
+    app.register_error_handler(404, pagina_404)
+    app.run()
