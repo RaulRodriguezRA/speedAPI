@@ -14,14 +14,14 @@ def connect():
     urllib3.disable_warnings()
     fmrest.utils.TIMEOUT = 30
     try:
-        server = fmrest.Server('https://a049937.fmphost.com',
-                               user='Admin',
-                               password='speedprint',
-                               database='speed2',
-                               layout='productos',
-                               verify_ssl=True,
-                               api_version='vLatest'
-                               )
+       server = fmrest.Server('https://a0410012.fmphost.com/',
+                                   user='Invitado',
+                                   password='speed',
+                                   database='Productos',
+                                   layout='Lista de precios',
+                                   verify_ssl=True,
+                                   api_version='vLatest'
+                                   )
         server.login()
         return server
     except ValueError as err:
@@ -121,9 +121,8 @@ def eliminar_producto(id_producto):
 
 
 def datos_producto(registro):
-    return {"id_registro":registro[7],"nombre": registro[0], "precio": registro[1], "material": registro[2],
-            "unidad": registro[3],
-            "color": registro[4], "altura": registro[5], "anchura": registro[6]}
+    return {"Codigo": registro[0], "Nombre": registro[1], "Descripcion": registro[2],
+            "Medida": registro[3], "Precio P": registro[4], "Precio M": registro[5]}
 
 
 def formato_producto(payload):
